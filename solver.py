@@ -121,12 +121,6 @@ class Solver:
 initial = "1 2 4 3 e 5 7 6 8"
 initial = initial.split()
 
-hola = []
-
-for i in range(len(initial)):
-    hola[i] = initial[i]
-
-print(hola)
 #initial_node = Node(initial)
 #initial_node.set_board(initial)
 
