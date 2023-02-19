@@ -115,8 +115,35 @@ class Node:
         return goal
 
 class Solver:
-    pass
+    def __init__(self) -> None:
+        pass
+    
+    # Returns list of nodes which is the path
+    def breadth_first_search(self, root:Node) -> list:
+        path_to_solution = []
+        #Keeps the nodes that can be expanded
+        open_list = []
+        # Store the nodes that have been already expanded
+        closed_list = []
 
+        open_list.append(root)
+        goal_found = False
+        while len(open_list) > 0 and not goal_found:
+            # Implementing queue
+            current_node : Node = open_list[0]
+            closed_list.append(current_node)
+            open_list.pop(0)
+
+            current_node.expand_node()
+            for i in range(len(current_node.children)):
+                current_child : Node = current_node.children[i]
+                if current_child.is_goal():
+                    print("Goal Found !!!!!")
+                    goal_found = True
+                    
+
+
+        return path_to_solution
 
 initial = "1 2 4 3 e 5 7 6 8"
 initial = initial.split()
