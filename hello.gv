@@ -1,0 +1,9 @@
+digraph G {
+	A [label="1 2 4
+3 0 5
+7 6 8"]
+	B [label="Hello All"]
+	C [label=H]
+	A -> B
+	A -> C
+}

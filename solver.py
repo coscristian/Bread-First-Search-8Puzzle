@@ -1,5 +1,7 @@
+import graphviz
+
 class Node:
-    def __init__(self, board: str):
+    def __init__(self, board: list):
         # Store the children nodes when moving Left, Up, Right or Down
         self.children = []
         # Store its parent node to track the path to the solution
@@ -38,7 +40,7 @@ class Node:
     def expand_node(self) -> None:
         blank_index = 0
         for i in range(len(self.board)):
-            if self.board[i] == 'e':
+            if self.board[i] == '0':
                 blank_index = i
 
         self.move_to_right(self.board, blank_index) 
@@ -106,20 +108,44 @@ class Node:
             a[i] = b[i]
 
     def is_goal(self):
-        goal = True
         m = self.board[0]
-        for i in range(1, len(self.board)):
-            if m > self.board[i]:
-                goal = False
+        for i in range(1, len(self.board)):            
+            if int(m) > int(self.board[i]):
+                return False
             m = self.board[i]
-        return goal
-
+        return True
+        
 class Solver:
     def __init__(self) -> None:
         pass
-    
+
+    def get_amount_movements(self):
+        return self.__amount_movements
+    def get_amount_enqueue_nodes(self):
+        return self.__amount_enqueue
+
     # Returns list of nodes which is the path
     def breadth_first_search(self, root:Node) -> list:
+
+        def path_trace(path: list, n: Node) -> int:
+            current : Node = n
+            path.append(current)
+            movements = 0
+            
+            while current.parent != None:
+                movements += 1
+                current = current.parent
+                path.append(current)
+            return movements
+
+        def contains(nodes: list, c: Node) -> bool:
+            contains = False
+            for i in range(len(nodes)):
+                n : Node = nodes[i]
+                if n.is_same_board(c.board):
+                    contains = True
+            return contains
+
         path_to_solution = []
         #Keeps the nodes that can be expanded
         open_list = []
@@ -127,27 +153,53 @@ class Solver:
         closed_list = []
 
         open_list.append(root)
+        self.__amount_enqueue = 1
         goal_found = False
+        
         while len(open_list) > 0 and not goal_found:
             # Implementing queue
             current_node : Node = open_list[0]
             closed_list.append(current_node)
+            
             open_list.pop(0)
 
             current_node.expand_node()
+            
             for i in range(len(current_node.children)):
                 current_child : Node = current_node.children[i]
                 if current_child.is_goal():
-                    print("Goal Found !!!!!")
                     goal_found = True
-                    
+                    self.__amount_movements = path_trace(path_to_solution, current_child)
 
-
+                if not contains(open_list, current_child) and not contains(closed_list, current_child):
+                    open_list.append(current_child)
+                    self.__amount_enqueue += 1
         return path_to_solution
 
-initial = "1 2 4 3 e 5 7 6 8"
+
+g = graphviz.Digraph('G', filename='hello.gv')
+
+g.node('A', '1 2 4\n3 0 5\n7 6 8')
+g.node('B', 'Hello All')
+g.node('C', 'H')
+
+g.edges(['AB', 'AC'])
+g.view()
+
+initial = "1 2 4 3 0 5 7 6 8"
+
 initial = initial.split()
+root_node = Node(initial)
 
-#initial_node = Node(initial)
-#initial_node.set_board(initial)
-
+solve = Solver()
+solution : list = solve.breadth_first_search(root_node)
+solution.reverse()
+if len(solution) > 0:
+    print("Goal Found !!!!! \n Tracing path...")
+    print(f"Amount of movements: {solve.get_amount_movements()}")
+    print(f"Amount of enqueue nodes: {solve.get_amount_enqueue_nodes()}")
+    board : Node
+    for board in solution:
+        board.print_board()
+else:
+    print("No path to solution is found !!!")
